@@ -1,4 +1,4 @@
-module gitlab.com/mborho/terraform-provider-ipfs
+module github.com/mborho/terraform-provider-ipfs
 
 go 1.14
 
