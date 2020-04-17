@@ -14,6 +14,22 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: "ipfs server address, default localhost:5001",
 			},
+			"temporal": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"username": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"password": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"ipfs_add":     resourceAdd(),
@@ -29,5 +45,12 @@ func Provider() *schema.Provider {
 
 func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	node := d.Get("node").(string)
-	return NewClient(node)
+
+	temporal := d.Get("temporal").(*schema.Set).List()
+	var creds map[string]interface{}
+	if len(temporal) > 0 {
+		creds = temporal[0].(map[string]interface{})
+	}
+
+	return NewClient(node, creds)
 }

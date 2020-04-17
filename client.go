@@ -1,30 +1,81 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	shell "github.com/ipfs/go-ipfs-api"
 	files "github.com/ipfs/go-ipfs-files"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 )
 
 type Client struct {
-	shell *shell.Shell
-	node  string
+	shell         *shell.Shell
+	temporalToken string
+	node          string
 }
 
-func NewClient(node string) (*Client, error) {
+func NewTemporalToken(creds map[string]interface{}) (string, error) { //*http.Client, error) {
+	url := "https://api.temporal.cloud/v2/auth/login"
+
+	reqBody, err := json.Marshal(map[string]string{
+		"username": fmt.Sprintf("%s", creds["username"]),
+		"password": fmt.Sprintf("%s", creds["password"]),
+	})
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("Authentication to Temporal failed!")
+	}
+
+	var data map[string]string
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return "", err
+	}
+
+	return data["token"], nil
+}
+
+func NewClient(node string, temporal map[string]interface{}) (*Client, error) {
 	sh := shell.NewShell(node)
 	sh.SetTimeout(10 * time.Minute)
-	// return client
+
 	client := &Client{
 		shell: sh,
 		node:  node,
+	}
+
+	// add temporal token token if neccessary
+	if len(temporal) > 0 {
+		temporalToken, err := NewTemporalToken(temporal)
+		if err != nil {
+			return nil, err
+		}
+		client.temporalToken = temporalToken
 	}
 	return client, nil
 }
