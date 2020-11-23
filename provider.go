@@ -14,6 +14,28 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: "ipfs server address, default localhost:5001",
 			},
+
+			"remote_pin_service": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"host": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"token": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"ipfs_add":           resourceAdd(),
@@ -30,5 +52,7 @@ func Provider() *schema.Provider {
 
 func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	node := d.Get("node").(string)
-	return NewClient(node)
+	remotePinServices := d.Get("remote_pin_service").([]interface{})
+
+	return NewClient(node, remotePinServices)
 }

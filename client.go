@@ -14,17 +14,20 @@ import (
 )
 
 type Client struct {
-	shell *shell.Shell
-	node  string
+	shell       *shell.Shell
+	node        string
+	pinServices map[string]*PinService
 }
 
-func NewClient(node string) (*Client, error) {
+func NewClient(node string, remotePinServices []interface{}) (*Client, error) {
 	sh := shell.NewShell(node)
 	sh.SetTimeout(10 * time.Minute)
-	// return client
+
+	pinServices := buildPinServiceConfigs(remotePinServices)
 	client := &Client{
-		shell: sh,
-		node:  node,
+		shell:       sh,
+		node:        node,
+		pinServices: pinServices,
 	}
 	return client, nil
 }
