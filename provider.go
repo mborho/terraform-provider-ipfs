@@ -33,6 +33,11 @@ func Provider() *schema.Provider {
 							Type:     schema.TypeString,
 							Required: true,
 						},
+						"skip_ssl_verify": &schema.Schema{
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  true,
+						},
 					},
 				},
 			},
@@ -45,6 +50,7 @@ func Provider() *schema.Provider {
 			"ipfs_publish":       resourcePublish(),
 			"ipfs_key":           resourceKey(),
 			"ipfs_swarm_connect": resourceSwarmConnect(),
+			"ipfs_remote_pin":    resourceRemotePin(),
 		},
 		ConfigureFunc: configureProvider,
 	}

@@ -11,13 +11,14 @@ import (
 )
 
 type PinService struct {
-	name  string
-	host  string
-	token string
+	name          string
+	host          string
+	token         string
+	skipSSLVerify bool
+	client        *http.Client
 }
 
 type RemotePinClient struct {
-	client   *http.Client
 	services interface{}
 }
 
@@ -27,24 +28,28 @@ func buildPinServiceConfigs(configs []interface{}) map[string]*PinService {
 	}
 
 	services := make(map[string]*PinService)
+	log.Println("[INFO] Load remote service remote clients.")
 	for _, config := range configs {
 		c := config.(map[string]interface{})
 		service := &PinService{
-			name:  c["name"].(string),
-			host:  c["host"].(string),
-			token: c["token"].(string),
+			name:          c["name"].(string),
+			host:          c["host"].(string),
+			token:         c["token"].(string),
+			skipSSLVerify: c["skip_ssl_verify"].(bool) == false,
+		}
+		if err := service.loadHttpClient(); err != nil {
+			log.Println("[INFO] Load remote service remote clients failed: ", err)
 		}
 		services[service.name] = service
 	}
 	return services
 }
 
-/*func NewRemotePinClient(services []string) (*RemotePinClient, error) {
-	log.Println("[INFO] Building remote pin client")
+func (p *PinService) loadHttpClient() error {
 
 	// build transport
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: p.skipSSLVerify},
 	}
 
 	// detect https proxy in environment
@@ -57,21 +62,20 @@ func buildPinServiceConfigs(configs []interface{}) map[string]*PinService {
 	if proxy_https != "" {
 		proxyUrl, err := url.Parse(proxy_https)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		tr.Proxy = http.ProxyURL(proxyUrl)
 	}
 
 	// build http client
-	var netClient = &http.Client{
+	p.client = &http.Client{
 		Timeout:   time.Minute * 10,
 		Transport: tr,
 	}
+	return nil
+}
 
-	// return client
-	client := &RemotePinClient{
-		client:   netClient,
-		services: services,
-	}
-	return client, nil
-}*/
+func (p *PinService) AddPin(cid, name string, origins []interface{}) error {
+	//req.Header("Authorization", fmt.Sprintf("Bearer %s", client.temporalToken))
+	return nil
+}
