@@ -25,7 +25,7 @@ func Provider() *schema.Provider {
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"host": {
+						"endpoint": {
 							Type:     schema.TypeString,
 							Required: true,
 						},

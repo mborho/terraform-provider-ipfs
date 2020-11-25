@@ -2,6 +2,7 @@ package main
 
 import (
 	//"context"
+	//"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
@@ -36,11 +37,11 @@ func resourceRemotePin() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				ForceNew: true,
 			},
-			"meta": &schema.Schema{
+			/*"meta": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
-			},
+			},*/
 			"request_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -51,11 +52,11 @@ func resourceRemotePin() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-			"info": &schema.Schema{
+			/*"info": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
-			},
+			},*/
 			"delegates": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
@@ -78,24 +79,18 @@ func resourceRemotePinCreate(d *schema.ResourceData, m interface{}) error {
 	log.Println("Name: ", name)
 	log.Println("Service: ", service)
 	log.Println("Origins: ", origins)
-	if pinClient, ok := client.pinServices[service]; ok {
-		log.Println("PinClient: ", pinClient)
-		//do something here
-	} else {
+	pinClient, ok := client.pinServices[service]
+	if ok != true {
 		return fmt.Errorf("load client for pin service %s failed!", service)
 	}
-	log.Println("#########################\n####################\n#########")
-	_ = client
-	d.SetId("requestId")
-
-	//var dels []interface{}
-	/*dels := make([]interface{}, 0)
-
-	dels = append(dels, "one")
-	dels = append(dels, "two")
-	s := []interface{}{}
-	s = append(s, "one")
-	d.Set("delegates", s)*/
+	resp, err := pinClient.AddPin(cid, name, origins)
+	if err != nil {
+		return nil
+	}
+	log.Println("DATA %+v", resp)
+	d.SetId(resp.RequestId)
+	d.Set("request_id", resp.RequestId)
+	d.Set("status", resp.Status)
 	return resourceRemotePinRead(d, m)
 }
 
@@ -108,6 +103,19 @@ func resourceRemotePinRead(d *schema.ResourceData, m interface{}) error {
 }*/
 
 func resourceRemotePinDelete(d *schema.ResourceData, m interface{}) error {
+	client := m.(*Client)
+	requestId := d.Get("request_id").(string)
+	service := d.Get("service").(string)
+	pinClient, ok := client.pinServices[service]
+	if ok != true {
+		return fmt.Errorf("load client for pin service %s failed!", service)
+	}
+
+	err := pinClient.RemovePin(requestId)
+	if err != nil {
+		return nil
+	}
+
 	d.SetId("")
 	return nil
 }

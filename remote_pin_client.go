@@ -1,8 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"crypto/tls"
+	"encoding/json"
+	"errors"
+	"fmt"
 	//"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -12,14 +18,26 @@ import (
 
 type PinService struct {
 	name          string
-	host          string
+	endpoint      string
 	token         string
 	skipSSLVerify bool
 	client        *http.Client
 }
 
-type RemotePinClient struct {
-	services interface{}
+type RemotePinObject struct {
+	Cid     string            `json:"cid"`
+	Name    string            `json:"name"`
+	Origins []string          `json:"origins"`
+	Meta    map[string]string `json:"meta"`
+}
+
+type RemotePinResponse struct {
+	RequestId string            `json:"requestid"`
+	Status    string            `json:"status"`
+	Created   string            `json:"created"`
+	Pin       RemotePinObject   `json:"pin"`
+	Delegates []string          `json:"delegates"`
+	Info      map[string]string `json:"info"`
 }
 
 func buildPinServiceConfigs(configs []interface{}) map[string]*PinService {
@@ -33,7 +51,7 @@ func buildPinServiceConfigs(configs []interface{}) map[string]*PinService {
 		c := config.(map[string]interface{})
 		service := &PinService{
 			name:          c["name"].(string),
-			host:          c["host"].(string),
+			endpoint:      c["endpoint"].(string),
 			token:         c["token"].(string),
 			skipSSLVerify: c["skip_ssl_verify"].(bool) == false,
 		}
@@ -75,7 +93,74 @@ func (p *PinService) loadHttpClient() error {
 	return nil
 }
 
-func (p *PinService) AddPin(cid, name string, origins []interface{}) error {
-	//req.Header("Authorization", fmt.Sprintf("Bearer %s", client.temporalToken))
-	return nil
+func (p *PinService) doApiRequest(mode string, apiUrl string, data []byte, successCode int, contentType ...string) ([]byte, error) {
+	var postData io.Reader
+
+	// handle content type
+	contentTypeHeader := "application/json"
+	if len(contentType) > 0 {
+		contentTypeHeader = contentType[0]
+	}
+
+	log.Printf("API Payload %s\n", data)
+
+	// handle post data
+	if len(data) > 0 {
+		postData = bytes.NewBuffer(data)
+	}
+	request, err := http.NewRequest(mode, apiUrl, postData)
+	if err != nil {
+		return nil, err
+	}
+	request.Header.Set("Content-Type", contentTypeHeader)
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", p.token))
+
+	response, err := p.client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	// parse response
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("API RESPONSE %s [%s]\n%s\n", apiUrl, response.StatusCode, contents)
+
+	if response.StatusCode != successCode {
+		log.Printf("[INFO] STATUS CODE %s %s\n", apiUrl, response.StatusCode)
+		log.Println(contents)
+		return nil, errors.New(fmt.Sprintf("API request failed:%s", contents))
+	}
+	return contents, err
+}
+
+func (p *PinService) AddPin(cid, name string, origins []interface{}) (*RemotePinResponse, error) {
+	apiUrl := fmt.Sprintf("%s/pins", p.endpoint)
+
+	reqBody, err := json.Marshal(map[string]string{
+		"cid":  cid,
+		"name": name,
+	})
+
+	contents, err := p.doApiRequest("POST", apiUrl, reqBody, 200)
+	if err != nil {
+		return nil, err
+	}
+	log.Println(contents)
+
+	responseData := RemotePinResponse{}
+	err = json.Unmarshal(contents, &responseData)
+	if err != nil {
+		return nil, err
+	}
+	return &responseData, nil
+}
+
+func (p *PinService) RemovePin(requestId string) error {
+	apiUrl := fmt.Sprintf("%s/pins/%s", p.endpoint, requestId)
+	_, err := p.doApiRequest("DELETE", apiUrl, nil, 202)
+	return err
 }
