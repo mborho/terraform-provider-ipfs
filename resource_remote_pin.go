@@ -37,11 +37,12 @@ func resourceRemotePin() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				ForceNew: true,
 			},
-			/*"meta": &schema.Schema{
-				Type:     schema.TypeString,
+			"meta": &schema.Schema{
+				Type:     schema.TypeMap,
 				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 				ForceNew: true,
-			},*/
+			},
 			"request_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -72,6 +73,7 @@ func resourceRemotePinCreate(d *schema.ResourceData, m interface{}) error {
 	cid := d.Get("cid").(string)
 	name := d.Get("name").(string)
 	origins := d.Get("origins").([]interface{})
+	meta := d.Get("meta").(map[string]interface{})
 	service := d.Get("service").(string)
 
 	log.Println("#########################\n####################\n#########")
@@ -83,7 +85,7 @@ func resourceRemotePinCreate(d *schema.ResourceData, m interface{}) error {
 	if ok != true {
 		return fmt.Errorf("load client for pin service %s failed!", service)
 	}
-	resp, err := pinClient.AddPin(cid, name, origins)
+	resp, err := pinClient.AddPin(cid, name, origins, meta)
 	if err != nil {
 		return nil
 	}

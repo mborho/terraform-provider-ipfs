@@ -137,19 +137,35 @@ func (p *PinService) doApiRequest(mode string, apiUrl string, data []byte, succe
 	return contents, err
 }
 
-func (p *PinService) AddPin(cid, name string, origins []interface{}) (*RemotePinResponse, error) {
+func (p *PinService) AddPin(cid, name string, origins []interface{}, meta map[string]interface{}) (*RemotePinResponse, error) {
 	apiUrl := fmt.Sprintf("%s/pins", p.endpoint)
 
-	reqBody, err := json.Marshal(map[string]string{
-		"cid":  cid,
-		"name": name,
-	})
+	var originsSlice []string
+	for _, param := range origins {
+		originsSlice = append(originsSlice, param.(string))
+	}
+
+	metaMap := make(map[string]string)
+	for k, v := range meta {
+		metaMap[k] = v.(string)
+	}
+
+	pin := &RemotePinObject{
+		Cid:     cid,
+		Name:    name,
+		Origins: originsSlice,
+		Meta:    metaMap,
+	}
+
+	reqBody, err := json.Marshal(pin)
+	if err != nil {
+		return nil, err
+	}
 
 	contents, err := p.doApiRequest("POST", apiUrl, reqBody, 200)
 	if err != nil {
 		return nil, err
 	}
-	log.Println(contents)
 
 	responseData := RemotePinResponse{}
 	err = json.Unmarshal(contents, &responseData)
