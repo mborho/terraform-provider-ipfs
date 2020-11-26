@@ -5,7 +5,6 @@ import (
 	//"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceRemotePin() *schema.Resource {
@@ -76,33 +75,41 @@ func resourceRemotePinCreate(d *schema.ResourceData, m interface{}) error {
 	meta := d.Get("meta").(map[string]interface{})
 	service := d.Get("service").(string)
 
-	log.Println("#########################\n####################\n#########")
-	log.Println("CID: ", cid)
-	log.Println("Name: ", name)
-	log.Println("Service: ", service)
-	log.Println("Origins: ", origins)
 	pinClient, ok := client.pinServices[service]
 	if ok != true {
-		return fmt.Errorf("load client for pin service %s failed!", service)
+		return fmt.Errorf("Pin service %s unknown!", service)
 	}
+
 	resp, err := pinClient.AddPin(cid, name, origins, meta)
 	if err != nil {
 		return nil
 	}
-	log.Println("DATA %+v", resp)
+
 	d.SetId(resp.RequestId)
 	d.Set("request_id", resp.RequestId)
 	d.Set("status", resp.Status)
+	d.Set("delegates", resp.Delegates)
 	return resourceRemotePinRead(d, m)
 }
 
 func resourceRemotePinRead(d *schema.ResourceData, m interface{}) error {
+	client := m.(*Client)
+	requestId := d.Get("request_id").(string)
+	service := d.Get("service").(string)
+	pinClient, ok := client.pinServices[service]
+	if ok != true {
+		return fmt.Errorf("Pin service %s unknown!", service)
+	}
+	resp, err := pinClient.GetPin(requestId)
+	if err != nil {
+		return nil
+	}
+
+	d.Set("request_id", resp.RequestId)
+	d.Set("status", resp.Status)
+	d.Set("delegates", resp.Delegates)
 	return nil
 }
-
-/*func resourceRemotePinUpdate(d *schema.ResourceData, m interface{}) error {
-	return nil
-}*/
 
 func resourceRemotePinDelete(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
@@ -110,7 +117,7 @@ func resourceRemotePinDelete(d *schema.ResourceData, m interface{}) error {
 	service := d.Get("service").(string)
 	pinClient, ok := client.pinServices[service]
 	if ok != true {
-		return fmt.Errorf("load client for pin service %s failed!", service)
+		return fmt.Errorf("Pin service %s unknown!", service)
 	}
 
 	err := pinClient.RemovePin(requestId)

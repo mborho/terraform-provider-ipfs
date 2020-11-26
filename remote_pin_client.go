@@ -175,6 +175,23 @@ func (p *PinService) AddPin(cid, name string, origins []interface{}, meta map[st
 	return &responseData, nil
 }
 
+func (p *PinService) GetPin(requestId string) (*RemotePinResponse, error) {
+	apiUrl := fmt.Sprintf("%s/pins/%s", p.endpoint, requestId)
+
+	contents, err := p.doApiRequest("GET", apiUrl, nil, 200)
+	if err != nil {
+		return nil, err
+	}
+
+	responseData := RemotePinResponse{}
+	err = json.Unmarshal(contents, &responseData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responseData, nil
+}
+
 func (p *PinService) RemovePin(requestId string) error {
 	apiUrl := fmt.Sprintf("%s/pins/%s", p.endpoint, requestId)
 	_, err := p.doApiRequest("DELETE", apiUrl, nil, 202)
