@@ -5,13 +5,14 @@ import (
 	//"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	// "log"
 )
 
 func resourceRemotePin() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceRemotePinCreate,
 		Read:   resourceRemotePinRead,
-		//Update: resourceRemotePinUpdate,
+		Update: resourceRemotePinUpdate,
 		Delete: resourceRemotePinDelete,
 
 		Schema: map[string]*schema.Schema{
@@ -23,24 +24,20 @@ func resourceRemotePin() *schema.Resource {
 			"cid": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
 			"origins": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				ForceNew: true,
 			},
 			"meta": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				ForceNew: true,
 			},
 			"request_id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -96,15 +93,43 @@ func resourceRemotePinRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
 	requestId := d.Get("request_id").(string)
 	service := d.Get("service").(string)
+
 	pinClient, ok := client.pinServices[service]
 	if ok != true {
 		return fmt.Errorf("Pin service %s unknown!", service)
 	}
+
 	resp, err := pinClient.GetPin(requestId)
 	if err != nil {
 		return nil
 	}
 
+	d.Set("request_id", resp.RequestId)
+	d.Set("status", resp.Status)
+	d.Set("delegates", resp.Delegates)
+	return nil
+}
+
+func resourceRemotePinUpdate(d *schema.ResourceData, m interface{}) error {
+	client := m.(*Client)
+	requestId := d.Get("request_id").(string)
+	service := d.Get("service").(string)
+	cid := d.Get("cid").(string)
+	name := d.Get("name").(string)
+	origins := d.Get("origins").([]interface{})
+	meta := d.Get("meta").(map[string]interface{})
+
+	pinClient, ok := client.pinServices[service]
+	if ok != true {
+		return fmt.Errorf("Pin service %s unknown!", service)
+	}
+
+	resp, err := pinClient.ReplacePin(requestId, cid, name, origins, meta)
+	if err != nil {
+		return nil
+	}
+
+	d.SetId(resp.RequestId)
 	d.Set("request_id", resp.RequestId)
 	d.Set("status", resp.Status)
 	d.Set("delegates", resp.Delegates)

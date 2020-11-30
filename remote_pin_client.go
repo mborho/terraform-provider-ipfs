@@ -137,9 +137,7 @@ func (p *PinService) doApiRequest(mode string, apiUrl string, data []byte, succe
 	return contents, err
 }
 
-func (p *PinService) AddPin(cid, name string, origins []interface{}, meta map[string]interface{}) (*RemotePinResponse, error) {
-	apiUrl := fmt.Sprintf("%s/pins", p.endpoint)
-
+func (p *PinService) PostPin(apiUrl, cid, name string, origins []interface{}, meta map[string]interface{}) (*RemotePinResponse, error) {
 	var originsSlice []string
 	for _, param := range origins {
 		originsSlice = append(originsSlice, param.(string))
@@ -173,6 +171,17 @@ func (p *PinService) AddPin(cid, name string, origins []interface{}, meta map[st
 		return nil, err
 	}
 	return &responseData, nil
+}
+
+func (p *PinService) AddPin(cid, name string, origins []interface{}, meta map[string]interface{}) (*RemotePinResponse, error) {
+	apiUrl := fmt.Sprintf("%s/pins", p.endpoint)
+	return p.PostPin(apiUrl, cid, name, origins, meta)
+
+}
+
+func (p *PinService) ReplacePin(requestId, cid, name string, origins []interface{}, meta map[string]interface{}) (*RemotePinResponse, error) {
+	apiUrl := fmt.Sprintf("%s/pins/%s", p.endpoint, requestId)
+	return p.PostPin(apiUrl, cid, name, origins, meta)
 }
 
 func (p *PinService) GetPin(requestId string) (*RemotePinResponse, error) {
