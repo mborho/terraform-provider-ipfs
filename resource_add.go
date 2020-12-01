@@ -24,12 +24,6 @@ func resourceAdd() *schema.Resource {
 				Computed: true,
 				ForceNew: true,
 			},
-			/*"pin": &schema.Schema{
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-				ForceNew: true,
-			},*/
 		},
 	}
 }

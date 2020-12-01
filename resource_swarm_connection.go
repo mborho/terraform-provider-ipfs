@@ -20,6 +20,12 @@ func resourceSwarmConnect() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				ForceNew: true,
 			},
+			"can_fail": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+				ForceNew: true,
+			},
 		},
 	}
 }
@@ -27,9 +33,10 @@ func resourceSwarmConnect() *schema.Resource {
 func resourceSwarmConnectCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
 	addresses := d.Get("addresses").([]interface{})
+	can_fail := d.Get("can_fail").(bool)
 	for _, addr := range addresses {
 		err := client.shell.SwarmConnect(context.Background(), addr.(string))
-		if err != nil {
+		if err != nil && can_fail == false {
 			return err
 		}
 
