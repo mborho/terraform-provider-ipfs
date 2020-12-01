@@ -2,6 +2,7 @@ terraform-provider-ipfs
 ========================
 This provider supports Terraform 0.12.x and later. It expects a running IPFS node on the local machine.
 
+[IPFS pinning service API ](https://ipfs.github.io/pinning-services-api-spec/) is implemented, though no vendor support at the moment.
 
 ## Requirements
 
@@ -37,7 +38,16 @@ See [terraform.io/docs/configuration/providers.html#third-party-plugins](https:/
 ```hcl
 provider "ipfs" {
     node = "<http address of ipfs node, default is localhost:5001>"
+    
+    remote_pin_service {
+      name            = "dev"
+      endpoint        = "https://pinning-service-api.example.com/api/v1"
+      token           = var.pinning_api_token
+      skip_ssl_verify = false
+  }
 }
+
+**remote_pinning_service** can be defined multiple times.
 ```
 
 ### ipfs_add
@@ -69,7 +79,7 @@ resource "ipfs_dir" {
 ### ipfs_file
 
 ```hcl
-resource "ipfs_file" {
+resource "ipfs_file" "example" {
     file = "./local/path/to/file.txt"
     path = "/ipfs-unixfs-path/filename.txt"
 }
@@ -83,11 +93,37 @@ resource "ipfs_file" {
 ### ipfs_pin
 
 ```hcl
-resource "ipfs_pin" {
+resource "ipfs_pin" "example" {
     cid = "Qm..."
 }
 ```
 
+### ipfs_remote_pin
+
+```hcl
+resource "ipfs_remote_pin" "example" {   
+  service = "vendor-name-from-provider"
+  cid     = ipfs_file.example.cid
+  name    = "name.1txt" 
+  origins = [
+    "/ip6/2a03:b0c0:3:d0::3281:e001/udp/4001/quic/p2p/12D3KooWNJGCBznrEnRngbvoE1gPzoW8sdiNE3kB1mQXYndzHYuP",
+    "/ip4/139.59.141.250/udp/4001/quic/p2p/12D3KooWNJGCBznrEnRngbvoE1gPzoW8sdiNE3kB1mQXYndzHYuP"
+  ]     
+  meta = {
+    foo = "bla"
+    baz = "baz"
+  }
+}
+```
+
+### ipfs_swarm_connect
+
+```hcl
+resource "ipfs_swarm_connect" "test" {
+  addresses = ipfs_remote_pin.example.delegates
+  can_fail  = true   # fail gracefully, no error when connect times out.
+}  
+```
 ### ipfs_key
 
 ```hcl
