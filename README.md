@@ -46,9 +46,16 @@ provider "ipfs" {
       skip_ssl_verify = false
   }
 }
-
-**remote_pinning_service** can be defined multiple times.
 ```
+
+**Arguments:**
+
+* **node** - Server address of the IPFS node, default is **localhost:5001**
+* **remote_pin_service** - Configuration of remote pinning service, can be defined *multiple* times. 
+  * **name** - Identifier name of pinning service, unique for this provider.
+  * **endpoint** - API endpoint of remote pinning service.
+  * **token** - Token for authentication.
+  * **skip_ssl_verify** - *boolean* Skip SSL verification, default is **false**
 
 ### ipfs_add
 
@@ -57,6 +64,10 @@ resource "ipfs_add" {
     path = "./path/to/file"
 }
 ```
+
+**Arguments:**
+
+* **path** - Path to the file to be added.
 
 **Attributes:**
 
@@ -70,6 +81,10 @@ resource "ipfs_dir" {
     path = "./path/to/directory/"
 }
 ```
+
+**Arguments:**
+
+* **path** - Path to the file to be added.
 
 **Attributes:**
 
@@ -85,6 +100,11 @@ resource "ipfs_file" "example" {
 }
 ```
 
+**Arguments:**
+
+* **file** - Path to the file to be added.
+* **path** - Path in the IPFS local filespace.
+
 **Attributes:**
 
 * **cid** - Content identifier of the added content.
@@ -98,13 +118,17 @@ resource "ipfs_pin" "example" {
 }
 ```
 
+**Arguments:**
+
+* **cid** - Content identifier of the content to be pinned.
+
 ### ipfs_remote_pin
 
 ```hcl
 resource "ipfs_remote_pin" "example" {   
   service = "vendor-name-from-provider"
   cid     = ipfs_file.example.cid
-  name    = "name.1txt" 
+  name    = "name.txt" 
   origins = [
     "/ip6/2a03:b0c0:3:d0::3281:e001/udp/4001/quic/p2p/12D3KooWNJGCBznrEnRngbvoE1gPzoW8sdiNE3kB1mQXYndzHYuP",
     "/ip4/139.59.141.250/udp/4001/quic/p2p/12D3KooWNJGCBznrEnRngbvoE1gPzoW8sdiNE3kB1mQXYndzHYuP"
@@ -116,6 +140,22 @@ resource "ipfs_remote_pin" "example" {
 }
 ```
 
+**Arguments:**
+
+* **service** - Name of the service, same as in provider setup.
+* **cid** - Content identifier of the content to be pinned.
+* **name** - Name of the content to be pinned.
+* **origins** - List of multi-addresses for service to grab content from.
+* **meta** - Map of meta informations to be saved at service.
+
+**Attributes:**
+
+* **request_id** - Id of the pin at the pinning service.
+* **status** - Status of the pin at the pinning service.
+* **delegates** - List of pinning services nodes to connect to.
+
+*info* data from service not supported by now.
+
 ### ipfs_swarm_connect
 
 ```hcl
@@ -124,6 +164,11 @@ resource "ipfs_swarm_connect" "test" {
   can_fail  = true   # fail gracefully, no error when connect times out.
 }  
 ```
+**Arguments:**
+
+* **origins** - List of multi-addresses for IPFS node to connect.
+* **can_fail** - *boolean*, connection request can fail gracefully, **true** is default.
+
 ### ipfs_key
 
 ```hcl
@@ -133,6 +178,11 @@ resource "ipfs_key" {
     size = 2048  // default
 }
 ```
+**Arguments:**
+
+* **name** - Name of the key.
+* **type** - Type of key, default, is **rsa**.
+* **size** - Size of key, default is **2048**.
 
 ### ipfs_publish
 
@@ -142,6 +192,11 @@ resource "ipfs_publish" {
     key = "my-new-key" // default 'self'/Node-ID
 }
 ```
+
+**Arguments:**
+
+* **cid** - Content identifier of the content to be published.
+* **key** - Name of the key under which the content will be published, default, is **self**.
 
 **Attributes:**
 
