@@ -36,7 +36,7 @@ func Provider() *schema.Provider {
 						"skip_ssl_verify": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
-							Default:  true,
+							Default:  false,
 						},
 					},
 				},
