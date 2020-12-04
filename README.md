@@ -50,12 +50,12 @@ provider "ipfs" {
 
 **Arguments:**
 
-* **node** - Server address of the IPFS node, default is **localhost:5001**
-* **remote_pin_service** - Configuration of remote pinning service, can be defined *multiple* times. 
-  * **name** - Identifier name of pinning service, unique for this provider.
-  * **endpoint** - API endpoint of remote pinning service.
-  * **token** - Token for authentication.
-  * **skip_ssl_verify** - *boolean* Skip SSL verification, default is **false**
+* **node** *string* - Server address of the IPFS node, default is **localhost:5001**
+* **remote_pin_service** *map* - Configuration of remote pinning service, can be defined *multiple* times. 
+  * **name** *string* - Identifier name of pinning service, unique for this provider.
+  * **endpoint** *string* - API endpoint of remote pinning service.
+  * **token** *string* - Token for authentication.
+  * **skip_ssl_verify** *bool* - Skip SSL verification, default is **false**
 
 ### ipfs_add
 
@@ -67,11 +67,11 @@ resource "ipfs_add" {
 
 **Arguments:**
 
-* **path** - Path to the file to be added.
+* **path** *string* - Path to the file to be added.
 
 **Attributes:**
 
-* **cid** - Content identifier of the added content.
+* **cid** *string* - Content identifier of the added content.
 
 
 ### ipfs_dir
@@ -84,11 +84,11 @@ resource "ipfs_dir" {
 
 **Arguments:**
 
-* **path** - Path to the file to be added.
+* **path** *string* - Path to the file to be added.
 
 **Attributes:**
 
-* **cid** - Content identifier of the added content.
+* **cid** *string* - Content identifier of the added content.
 
 
 ### ipfs_file
@@ -102,12 +102,12 @@ resource "ipfs_file" "example" {
 
 **Arguments:**
 
-* **file** - Path to the file to be added.
-* **path** - Path in the IPFS local filespace.
+* **file** *string* - Path to the file to be added.
+* **path** *string* - Path in the IPFS local filespace.
 
 **Attributes:**
 
-* **cid** - Content identifier of the added content.
+* **cid** *string* - Content identifier of the added content.
 
 
 ### ipfs_pin
@@ -120,7 +120,7 @@ resource "ipfs_pin" "example" {
 
 **Arguments:**
 
-* **cid** - Content identifier of the content to be pinned.
+* **cid** *string* - Content identifier of the content to be pinned.
 
 ### ipfs_remote_pin
 
@@ -142,17 +142,17 @@ resource "ipfs_remote_pin" "example" {
 
 **Arguments:**
 
-* **service** - Name of the service, same as in provider setup.
-* **cid** - Content identifier of the content to be pinned.
-* **name** - Name of the content to be pinned.
-* **origins** - List of multi-addresses for service to grab content from.
-* **meta** - Map of meta informations to be saved at service.
+* **service** *string* - Name of the service, same as in provider setup.
+* **cid** *string* - Content identifier of the content to be pinned.
+* **name** *string* - Name of the content to be pinned.
+* **origins** *list* - List of multi-addresses for service to grab content from.
+* **meta** *map* - Map of meta informations to be saved at service.
 
 **Attributes:**
 
-* **request_id** - Id of the pin at the pinning service.
-* **status** - Status of the pin at the pinning service.
-* **delegates** - List of pinning services nodes to connect to.
+* **request_id** *string* - Id of the pin at the pinning service.
+* **status** *string* - Status of the pin at the pinning service.
+* **delegates** *list* - List of pinning services nodes to connect to.
 
 *info* data from service not supported by now.
 
@@ -166,8 +166,8 @@ resource "ipfs_swarm_connect" "test" {
 ```
 **Arguments:**
 
-* **origins** - List of multi-addresses for IPFS node to connect.
-* **can_fail** - *boolean*, connection request can fail gracefully, **true** is default.
+* **origins** *list* - List of multi-addresses for IPFS node to connect.
+* **can_fail** *bool* - Connection requests can fail gracefully, **true** is default.
 
 ### ipfs_key
 
@@ -180,9 +180,9 @@ resource "ipfs_key" {
 ```
 **Arguments:**
 
-* **name** - Name of the key.
-* **type** - Type of key, default, is **rsa**.
-* **size** - Size of key, default is **2048**.
+* **name** *string* - Name of the key.
+* **type** *string* - Type of key, default, is **rsa**.
+* **size** *int* - Size of key, default is **2048**.
 
 ### ipfs_publish
 
@@ -195,14 +195,14 @@ resource "ipfs_publish" {
 
 **Arguments:**
 
-* **cid** - Content identifier of the content to be published.
-* **key** - Name of the key under which the content will be published, default, is **self**.
+* **cid** *string* - Content identifier of the content to be published.
+* **key** *string* - Name of the key under which the content will be published, default, is **self**.
 
 **Attributes:**
 
-* **path** - Published IPFS path.
-* **name** - Name under the content was published, **/ipns/...**
-* **value** - Published IPFS path.
+* **path** *string* - Published IPFS path.
+* **name** *string* - Name under the content was published, **/ipns/...**
+* **value** *string* - Published IPFS path.
 
 
 
