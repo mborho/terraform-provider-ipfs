@@ -79,7 +79,7 @@ func resourceRemotePinCreate(d *schema.ResourceData, m interface{}) error {
 
 	resp, err := pinClient.AddPin(cid, name, origins, meta)
 	if err != nil {
-		return nil
+		return fmt.Errorf("Error when calling remote pin service: %s", err)
 	}
 
 	d.SetId(resp.RequestId)
@@ -101,7 +101,7 @@ func resourceRemotePinRead(d *schema.ResourceData, m interface{}) error {
 
 	resp, err := pinClient.GetPin(requestId)
 	if err != nil {
-		return nil
+		return fmt.Errorf("Error when calling remote pin service: %s", err)
 	}
 
 	d.Set("request_id", resp.RequestId)
@@ -126,7 +126,7 @@ func resourceRemotePinUpdate(d *schema.ResourceData, m interface{}) error {
 
 	resp, err := pinClient.ReplacePin(requestId, cid, name, origins, meta)
 	if err != nil {
-		return nil
+		return fmt.Errorf("Error when calling remote pin service: %s", err)
 	}
 
 	d.SetId(resp.RequestId)
@@ -147,7 +147,7 @@ func resourceRemotePinDelete(d *schema.ResourceData, m interface{}) error {
 
 	err := pinClient.RemovePin(requestId)
 	if err != nil {
-		return nil
+		return fmt.Errorf("Error when calling remote pin service: %s", err)
 	}
 
 	d.SetId("")
