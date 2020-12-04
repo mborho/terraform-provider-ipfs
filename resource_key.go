@@ -56,7 +56,7 @@ func resourceKeyCreate(d *schema.ResourceData, m interface{}) error {
 
 	err := req.Exec(context.Background(), &keyResp)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error adding key: %s", err)
 	}
 
 	d.SetId(keyResp.Id)
@@ -72,7 +72,7 @@ func resourceKeyRead(d *schema.ResourceData, m interface{}) error {
 
 	err := req.Exec(context.Background(), &resp)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error reading key: %s", err)
 	}
 	for _, k := range resp.Keys {
 		if k.Name == name {
@@ -93,7 +93,7 @@ func resourceKeyDelete(d *schema.ResourceData, m interface{}) error {
 
 	err := req.Exec(context.Background(), &resp)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error deleting key: %s", err)
 	}
 	for _, k := range resp.Keys {
 		if k.Name == name {

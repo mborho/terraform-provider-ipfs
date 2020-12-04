@@ -1,18 +1,15 @@
 package main
 
 import (
-	_ "github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
-	//"os"
-	//"path/filepath"
 )
 
 func resourceDir() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceDirCreate,
-		Read:   resourceDirRead,
-		//Update:        resourceDirUpdate,
+		Create:        resourceDirCreate,
+		Read:          resourceDirRead,
 		Delete:        resourceDirDelete,
 		CustomizeDiff: resourceDirCustomizeDiff,
 
@@ -54,7 +51,7 @@ func resourceDirCreate(d *schema.ResourceData, m interface{}) error {
 	dirPath := d.Get("path").(string)
 	cid, err := client.shell.AddDir(dirPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error adding directory: %s", err)
 	}
 	d.SetId(cid)
 	d.Set("cid", cid)
@@ -63,26 +60,23 @@ func resourceDirCreate(d *schema.ResourceData, m interface{}) error {
 
 func resourceDirRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
-	//cid := d.Id()
 	filePath := d.Get("path").(string)
 
 	newHash, err := client.getHashDir(filePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error reading directory hash: %s", err)
 	}
 	d.Set("cid", newHash)
 	return nil
 }
 
 func resourceDirDelete(d *schema.ResourceData, m interface{}) error {
-	log.Println("######## DELETE ###########")
 	client := m.(*Client)
 	cid := d.Id()
 	d.SetId("")
 	err := client.shell.Unpin(cid)
 	if err != nil {
-		log.Println("Error deleting ", err)
-		//return err
+		log.Println("Error unpinning directory: ", err)
 	}
 	return nil
 }

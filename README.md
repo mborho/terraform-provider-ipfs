@@ -2,6 +2,7 @@ terraform-provider-ipfs
 ========================
 This provider supports Terraform 0.12.x and later. It expects a running IPFS node on the local machine.
 
+[IPFS pinning service API ](https://ipfs.github.io/pinning-services-api-spec/) is implemented, though no vendor support at the moment.
 
 ## Requirements
 
@@ -37,8 +38,24 @@ See [terraform.io/docs/configuration/providers.html#third-party-plugins](https:/
 ```hcl
 provider "ipfs" {
     node = "<http address of ipfs node, default is localhost:5001>"
+    
+    remote_pin_service {
+      name            = "dev"
+      endpoint        = "https://pinning-service-api.example.com/api/v1"
+      token           = var.pinning_api_token
+      skip_ssl_verify = false
+  }
 }
 ```
+
+**Arguments:**
+
+* **node** *string* - Server address of the IPFS node, default is **localhost:5001**
+* **remote_pin_service** *map* - Configuration of remote pinning service, can be defined *multiple* times. 
+  * **name** *string* - Identifier name of pinning service, unique for this provider.
+  * **endpoint** *string* - API endpoint of remote pinning service.
+  * **token** *string* - Token for authentication.
+  * **skip_ssl_verify** *bool* - Skip SSL verification, default is **false**
 
 ### ipfs_add
 
@@ -48,9 +65,13 @@ resource "ipfs_add" {
 }
 ```
 
+**Arguments:**
+
+* **path** *string* - Path to the file to be added.
+
 **Attributes:**
 
-* **cid** - Content identifier of the added content.
+* **cid** *string* - Content identifier of the added content.
 
 
 ### ipfs_dir
@@ -61,32 +82,92 @@ resource "ipfs_dir" {
 }
 ```
 
+**Arguments:**
+
+* **path** *string* - Path to the file to be added.
+
 **Attributes:**
 
-* **cid** - Content identifier of the added content.
+* **cid** *string* - Content identifier of the added content.
 
 
 ### ipfs_file
 
 ```hcl
-resource "ipfs_file" {
+resource "ipfs_file" "example" {
     file = "./local/path/to/file.txt"
     path = "/ipfs-unixfs-path/filename.txt"
 }
 ```
 
+**Arguments:**
+
+* **file** *string* - Path to the file to be added.
+* **path** *string* - Path in the IPFS local filespace.
+
 **Attributes:**
 
-* **cid** - Content identifier of the added content.
+* **cid** *string* - Content identifier of the added content.
 
 
 ### ipfs_pin
 
 ```hcl
-resource "ipfs_pin" {
+resource "ipfs_pin" "example" {
     cid = "Qm..."
 }
 ```
+
+**Arguments:**
+
+* **cid** *string* - Content identifier of the content to be pinned.
+
+### ipfs_remote_pin
+
+```hcl
+resource "ipfs_remote_pin" "example" {   
+  service = "vendor-name-from-provider"
+  cid     = ipfs_file.example.cid
+  name    = "name.txt" 
+  origins = [
+    "/ip6/2a03:b0c0:3:d0::3281:e001/udp/4001/quic/p2p/12D3KooWNJGCBznrEnRngbvoE1gPzoW8sdiNE3kB1mQXYndzHYuP",
+    "/ip4/139.59.141.250/udp/4001/quic/p2p/12D3KooWNJGCBznrEnRngbvoE1gPzoW8sdiNE3kB1mQXYndzHYuP"
+  ]     
+  meta = {
+    foo = "bla"
+    baz = "baz"
+  }
+}
+```
+
+**Arguments:**
+
+* **service** *string* - Name of the service, same as in provider setup.
+* **cid** *string* - Content identifier of the content to be pinned.
+* **name** *string* - Name of the content to be pinned.
+* **origins** *list* - List of multi-addresses for service to grab content from.
+* **meta** *map* - Map of meta informations to be saved at service.
+
+**Attributes:**
+
+* **request_id** *string* - Id of the pin at the pinning service.
+* **status** *string* - Status of the pin at the pinning service.
+* **delegates** *list* - List of pinning services nodes to connect to.
+
+*info* data from service not supported by now.
+
+### ipfs_swarm_connect
+
+```hcl
+resource "ipfs_swarm_connect" "test" {
+  addresses = ipfs_remote_pin.example.delegates
+  can_fail  = true   # fail gracefully, no error when connect times out.
+}  
+```
+**Arguments:**
+
+* **origins** *list* - List of multi-addresses for IPFS node to connect.
+* **can_fail** *bool* - Connection requests can fail gracefully, **true** is default.
 
 ### ipfs_key
 
@@ -97,6 +178,11 @@ resource "ipfs_key" {
     size = 2048  // default
 }
 ```
+**Arguments:**
+
+* **name** *string* - Name of the key.
+* **type** *string* - Type of key, default, is **rsa**.
+* **size** *int* - Size of key, default is **2048**.
 
 ### ipfs_publish
 
@@ -107,11 +193,16 @@ resource "ipfs_publish" {
 }
 ```
 
+**Arguments:**
+
+* **cid** *string* - Content identifier of the content to be published.
+* **key** *string* - Name of the key under which the content will be published, default, is **self**.
+
 **Attributes:**
 
-* **path** - Published IPFS path.
-* **name** - Name under the content was published, **/ipns/...**
-* **value** - Published IPFS path.
+* **path** *string* - Published IPFS path.
+* **name** *string* - Name under the content was published, **/ipns/...**
+* **value** *string* - Published IPFS path.
 
 
 

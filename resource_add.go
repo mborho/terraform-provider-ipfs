@@ -1,8 +1,8 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	// shell "github.com/ipfs/go-ipfs-api"
 	"os"
 )
 
@@ -24,12 +24,6 @@ func resourceAdd() *schema.Resource {
 				Computed: true,
 				ForceNew: true,
 			},
-			/*"pin": &schema.Schema{
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-				ForceNew: true,
-			},*/
 		},
 	}
 }
@@ -52,7 +46,6 @@ func resourceAddCustomizeDiff(d *schema.ResourceDiff, m interface{}) error {
 func resourceAddCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
 	filePath := d.Get("path").(string)
-	//pin := d.Get("pin").(bool)
 
 	f, err := os.Open(filePath)
 	defer f.Close()
@@ -60,9 +53,9 @@ func resourceAddCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	cid, err := client.shell.Add(f) //, shell.Pin(pin))
+	cid, err := client.shell.Add(f)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error adding object: %s", err)
 	}
 	d.SetId(cid)
 	d.Set("cid", cid)
@@ -74,7 +67,7 @@ func resourceAddRead(d *schema.ResourceData, m interface{}) error {
 	filePath := d.Get("path").(string)
 	newHash, err := client.getHash(filePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error reading object hash: %s", err)
 	}
 	d.Set("cid", newHash)
 	return nil

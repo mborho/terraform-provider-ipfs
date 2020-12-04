@@ -14,14 +14,43 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: "ipfs server address, default localhost:5001",
 			},
+
+			"remote_pin_service": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"endpoint": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"token": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"skip_ssl_verify": &schema.Schema{
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+						},
+					},
+				},
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"ipfs_add":     resourceAdd(),
-			"ipfs_dir":     resourceDir(),
-			"ipfs_file":    resourceFile(),
-			"ipfs_pin":     resourcePin(),
-			"ipfs_publish": resourcePublish(),
-			"ipfs_key":     resourceKey(),
+			"ipfs_add":           resourceAdd(),
+			"ipfs_dir":           resourceDir(),
+			"ipfs_file":          resourceFile(),
+			"ipfs_pin":           resourcePin(),
+			"ipfs_publish":       resourcePublish(),
+			"ipfs_key":           resourceKey(),
+			"ipfs_swarm_connect": resourceSwarmConnect(),
+			"ipfs_remote_pin":    resourceRemotePin(),
 		},
 		ConfigureFunc: configureProvider,
 	}
@@ -29,5 +58,7 @@ func Provider() *schema.Provider {
 
 func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	node := d.Get("node").(string)
-	return NewClient(node)
+	remotePinServices := d.Get("remote_pin_service").([]interface{})
+
+	return NewClient(node, remotePinServices)
 }

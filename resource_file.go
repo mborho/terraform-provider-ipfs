@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	_ "fmt"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"os"
@@ -69,7 +69,7 @@ func resourceFileCreate(d *schema.ResourceData, m interface{}) error {
 
 	err = req.Exec(context.Background(), nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error adding file: %s", err)
 	}
 	d.SetId(path)
 	return resourceFileRead(d, m)
@@ -83,7 +83,7 @@ func resourceFileRead(d *schema.ResourceData, m interface{}) error {
 	req := client.shell.Request("files/ls", path)
 	req.Option("l", true)
 	if err := req.Exec(context.Background(), &resp); err != nil {
-		return err
+		return fmt.Errorf("Error reading file: %s", err)
 	}
 
 	for _, e := range resp.Entries {
@@ -102,7 +102,7 @@ func resourceFileDelete(d *schema.ResourceData, m interface{}) error {
 
 	req := client.shell.Request("files/rm", path)
 	if err := req.Exec(context.Background(), nil); err != nil {
-		return err
+		return fmt.Errorf("Error deleting file: %s", err)
 	}
 
 	d.SetId("")
