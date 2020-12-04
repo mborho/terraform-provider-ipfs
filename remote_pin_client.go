@@ -16,6 +16,10 @@ import (
 	"time"
 )
 
+var (
+	pinningSuccessCodes = map[int]bool{200: true, 202: true}
+)
+
 type PinService struct {
 	name          string
 	endpoint      string
@@ -93,7 +97,7 @@ func (p *PinService) loadHttpClient() error {
 	return nil
 }
 
-func (p *PinService) doApiRequest(mode string, apiUrl string, data []byte, successCode int, contentType ...string) ([]byte, error) {
+func (p *PinService) doApiRequest(mode string, apiUrl string, data []byte, successCodes map[int]bool, contentType ...string) ([]byte, error) {
 	var postData io.Reader
 
 	// handle content type
@@ -129,7 +133,7 @@ func (p *PinService) doApiRequest(mode string, apiUrl string, data []byte, succe
 
 	log.Printf("API RESPONSE %s [%s]\n%s\n", apiUrl, response.StatusCode, contents)
 
-	if response.StatusCode != successCode {
+	if _, ok := successCodes[response.StatusCode]; ok == false {
 		log.Printf("[INFO] STATUS CODE %s %s\n", apiUrl, response.StatusCode)
 		log.Println(contents)
 		return nil, errors.New(fmt.Sprintf("API request failed:%s", contents))
@@ -160,7 +164,7 @@ func (p *PinService) PostPin(apiUrl, cid, name string, origins []interface{}, me
 		return nil, err
 	}
 
-	contents, err := p.doApiRequest("POST", apiUrl, reqBody, 200)
+	contents, err := p.doApiRequest("POST", apiUrl, reqBody, pinningSuccessCodes)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +191,7 @@ func (p *PinService) ReplacePin(requestId, cid, name string, origins []interface
 func (p *PinService) GetPin(requestId string) (*RemotePinResponse, error) {
 	apiUrl := fmt.Sprintf("%s/pins/%s", p.endpoint, requestId)
 
-	contents, err := p.doApiRequest("GET", apiUrl, nil, 200)
+	contents, err := p.doApiRequest("GET", apiUrl, nil, pinningSuccessCodes)
 	if err != nil {
 		return nil, err
 	}
@@ -203,6 +207,6 @@ func (p *PinService) GetPin(requestId string) (*RemotePinResponse, error) {
 
 func (p *PinService) RemovePin(requestId string) error {
 	apiUrl := fmt.Sprintf("%s/pins/%s", p.endpoint, requestId)
-	_, err := p.doApiRequest("DELETE", apiUrl, nil, 202)
+	_, err := p.doApiRequest("DELETE", apiUrl, nil, pinningSuccessCodes)
 	return err
 }
