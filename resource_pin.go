@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -36,7 +37,7 @@ func resourcePinCreate(d *schema.ResourceData, m interface{}) error {
 
 	err := client.shell.Pin(cid)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error creating pin: %s", err)
 	}
 	d.SetId(cid)
 	return resourcePinRead(d, m)
@@ -53,7 +54,7 @@ func resourcePinRead(d *schema.ResourceData, m interface{}) error {
 	err := req.Exec(context.Background(), &resp)
 	if err != nil {
 		d.SetId("")
-		return nil
+		return fmt.Errorf("Error reading pin: %s", err)
 	}
 	if len(resp.Keys) == 1 && resp.Keys[cid].Type != "indirect" {
 		return nil
@@ -69,7 +70,7 @@ func resourcePinDelete(d *schema.ResourceData, m interface{}) error {
 
 	err := client.shell.Unpin(cid)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error deleting pin: %s", err)
 	}
 
 	d.SetId("")

@@ -37,7 +37,7 @@ func resourceSwarmConnectCreate(d *schema.ResourceData, m interface{}) error {
 	for _, addr := range addresses {
 		err := client.shell.SwarmConnect(context.Background(), addr.(string))
 		if err != nil && can_fail == false {
-			return err
+			return fmt.Errorf("Error at connecting to swarm: %s", err)
 		}
 
 	}

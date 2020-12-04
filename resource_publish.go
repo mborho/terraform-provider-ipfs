@@ -54,7 +54,7 @@ func resourcePublishCreate(d *schema.ResourceData, m interface{}) error {
 	path := fmt.Sprintf("/ipfs/%s", cid)
 	resp, err := client.shell.PublishWithDetails(path, key, 0, 0, true)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error publishing cid: %s", err)
 	}
 
 	d.SetId(resp.Name)
@@ -71,7 +71,7 @@ func resourcePublishRead(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	resolvedName, err := client.shell.Resolve(name)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error resolving namespace: %s", err)
 	}
 
 	path := d.Get("path").(string)
