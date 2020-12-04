@@ -4,6 +4,11 @@ This provider supports Terraform 0.12.x and later. It expects a running IPFS nod
 
 [IPFS pinning service API ](https://ipfs.github.io/pinning-services-api-spec/) is implemented, though no vendor support at the moment.
 
+## Roadmap
+
+* release on registry.terraform.io
+* pubsub: channel and message
+
 ## Requirements
 
 
