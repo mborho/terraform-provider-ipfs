@@ -14,7 +14,7 @@ func resourceDir() *schema.Resource {
 		CustomizeDiff: resourceDirCustomizeDiff,
 
 		Schema: map[string]*schema.Schema{
-			"path": &schema.Schema{
+			"local_path": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -30,7 +30,7 @@ func resourceDir() *schema.Resource {
 
 func resourceDirCustomizeDiff(d *schema.ResourceDiff, m interface{}) error {
 	client := m.(*Client)
-	filePath := d.Get("path").(string)
+	filePath := d.Get("local_path").(string)
 	id := d.Id()
 
 	newHash, err := client.getHashDir(filePath)
@@ -48,7 +48,7 @@ func resourceDirCustomizeDiff(d *schema.ResourceDiff, m interface{}) error {
 
 func resourceDirCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
-	dirPath := d.Get("path").(string)
+	dirPath := d.Get("local_path").(string)
 	cid, err := client.shell.AddDir(dirPath)
 	if err != nil {
 		return fmt.Errorf("Error adding directory: %s", err)
@@ -60,7 +60,7 @@ func resourceDirCreate(d *schema.ResourceData, m interface{}) error {
 
 func resourceDirRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
-	filePath := d.Get("path").(string)
+	filePath := d.Get("local_path").(string)
 
 	newHash, err := client.getHashDir(filePath)
 	if err != nil {

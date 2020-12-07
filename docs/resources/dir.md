@@ -6,13 +6,13 @@ Add a directory to IPFS.
 
 ```hcl
 resource "ipfs_dir" {
-    path = "./path/to/directory/"
+    local_path = "./path/to/directory/"
 }
 ```
 
 ## Argument Reference
 
-* `path` - Path of the directory to be added.
+* `local_path` - Local filesystem path of the directory to be added.
 
 ## Attribute Reference
 
