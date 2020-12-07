@@ -2,7 +2,7 @@
 
 Pin objects to a remote pinning service.
 
-Implements the [IPFS pinning service API Spec](https://ipfs.github.io/pinning-services-api-spec/).
+-> Implements the [IPFS pinning service API Spec](https://ipfs.github.io/pinning-services-api-spec/).
 
 ## Example Usage
 
@@ -36,4 +36,4 @@ resource "ipfs_remote_pin" "example" {
 * `status` - Status of the pin at the pinning service.
 * `delegates` - List of IPFS multi-addresses of pinning services nodes to connect to.
 
-*info* data from service not supported by now.
+~> *info* data from service not supported by now.

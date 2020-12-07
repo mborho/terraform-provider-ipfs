@@ -2,7 +2,7 @@
 
 Opens new direct connections to a list of given peer addresses.
 
-The address format is an IPFS multiaddr: `/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ`
+-> The address format is an IPFS multiaddr: `/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ`
 
 
 ## Example Usage
