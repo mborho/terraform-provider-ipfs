@@ -6,14 +6,14 @@ Add a file to IPFS.
 
 ```hcl
 resource "ipfs_add" {
-    path = "./path/to/file"
+    local_path = "./path/to/file"
 }
 ```
 
 ## Argument Reference
 
 
-* `path` - The path to a file to be added to ipfs.
+* `local_path` - local filesystem path to be added to ipfs.
 
 ## Attribute Reference
 

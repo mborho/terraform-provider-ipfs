@@ -14,7 +14,7 @@ func resourceAdd() *schema.Resource {
 		CustomizeDiff: resourceAddCustomizeDiff,
 
 		Schema: map[string]*schema.Schema{
-			"path": &schema.Schema{
+			"local_path": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -31,7 +31,7 @@ func resourceAdd() *schema.Resource {
 func resourceAddCustomizeDiff(d *schema.ResourceDiff, m interface{}) error {
 	client := m.(*Client)
 	id := d.Id()
-	filePath := d.Get("path").(string)
+	filePath := d.Get("local_path").(string)
 
 	newHash, err := client.getHash(filePath)
 	if err != nil {
@@ -45,7 +45,7 @@ func resourceAddCustomizeDiff(d *schema.ResourceDiff, m interface{}) error {
 
 func resourceAddCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
-	filePath := d.Get("path").(string)
+	filePath := d.Get("local_path").(string)
 
 	f, err := os.Open(filePath)
 	defer f.Close()
@@ -64,7 +64,7 @@ func resourceAddCreate(d *schema.ResourceData, m interface{}) error {
 
 func resourceAddRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
-	filePath := d.Get("path").(string)
+	filePath := d.Get("local_path").(string)
 	newHash, err := client.getHash(filePath)
 	if err != nil {
 		return fmt.Errorf("Error reading object hash: %s", err)
