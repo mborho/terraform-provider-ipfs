@@ -2,6 +2,8 @@
 
 Pin objects to local storage.
 
+-> Objects linked to by the specified `cid` will get recursively pinned.
+
 ## Example Usage
 
 ```hcl
