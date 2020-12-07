@@ -19,7 +19,7 @@ func resourcePublish() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"cid": &schema.Schema{
+			"path": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -29,10 +29,6 @@ func resourcePublish() *schema.Resource {
 				Optional: true,
 				Default:  "self",
 				ForceNew: true,
-			},
-			"path": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
 			},
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -48,17 +44,15 @@ func resourcePublish() *schema.Resource {
 
 func resourcePublishCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
-	cid := d.Get("cid").(string)
+	path := d.Get("path").(string)
 	key := d.Get("key").(string)
 
-	path := fmt.Sprintf("/ipfs/%s", cid)
 	resp, err := client.shell.PublishWithDetails(path, key, 0, 0, true)
 	if err != nil {
-		return fmt.Errorf("Error publishing cid: %s", err)
+		return fmt.Errorf("Error publishing ipfs path: %s", err)
 	}
 
 	d.SetId(resp.Name)
-	d.Set("path", path)
 	d.Set("name", resp.Name)
 	d.Set("value", resp.Value)
 
@@ -74,8 +68,8 @@ func resourcePublishRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Error resolving namespace: %s", err)
 	}
 
-	path := d.Get("path").(string)
-	if resolvedName != path {
+	pub_path := d.Get("value").(string)
+	if resolvedName != pub_path {
 		d.SetId("")
 	}
 	return nil
