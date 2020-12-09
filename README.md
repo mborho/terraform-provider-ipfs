@@ -37,19 +37,19 @@ See [registry.terraform.io/providers/mborho/ipfs/latest/docs](https://registry.t
 
 ### Resources:
 
-* [ipfs_add](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/add.md)
-* [ipfs_dir](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/dir.md)
-* [ipfs_file](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/file.md)
-* [ipfs_key](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/key.md)
-* [ipfs_pin](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/pin.md)
-* [ipfs_remote_pin](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/remote-pin.md)
-* [ipfs_swarm_connect](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/swarm-connect.md)
-* [ipfs_publish](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/publish.md)
+* [ipfs_add](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/add)
+* [ipfs_dir](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/dir)
+* [ipfs_file](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/file)
+* [ipfs_key](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/key)
+* [ipfs_pin](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/pin)
+* [ipfs_remote_pin](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/remote-pin)
+* [ipfs_swarm_connect](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/swarm-connect)
+* [ipfs_publish](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/publish)
 
 ### Guides
 
-* [Add DNS entry at Cloudflare](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/guides/dns.md)
-* [Publish an object as IPNS name.](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/guides/publish.md)
+* [Add DNS entry at Cloudflare](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/guides/dns)
+* [Publish an object as IPNS name.](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/guides/publish)
 
 ## License
 
