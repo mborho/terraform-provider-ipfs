@@ -7,6 +7,14 @@ This provider supports Terraform 0.12.x and later. It expects a running IPFS nod
 ## Example Usage
 
 ```hcl
+terraform {
+  required_providers {
+    ipfs = {
+      source  = "mborho/ipfs"
+      version = "=> 0.1.0"
+    }
+}
+
 provider "ipfs" {
     node = "<http address of ipfs node, default is localhost:5001>"
 

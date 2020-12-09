@@ -6,6 +6,13 @@ page_title: "Publish an object as IPNS name."
 
 
 ```hcl
+terraform {
+  required_providers {
+    ipfs = {
+      source  = "mborho/ipfs"
+      version = "=> 0.1.0"
+    }
+}
 
 provider "ipfs" {}
 
