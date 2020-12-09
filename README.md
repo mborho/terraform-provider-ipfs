@@ -1,17 +1,17 @@
 terraform-provider-ipfs
 ========================
-This provider supports Terraform 0.12.x and later. It expects a running IPFS node on the local machine.
+
+![release](https://github.com/mborho/terraform-provider-ipfs/workflows/release/badge.svg)
+
+This provider supports Terraform 0.13.x and later. *(0.12.x if building manually*. 
+
+It expects a running IPFS node on the local machine.
 
 [IPFS pinning service API ](https://ipfs.github.io/pinning-services-api-spec/) is implemented, though no vendor support at the moment.
 
-## Requirements
-
-
-- [Terraform](https://www.terraform.io/downloads.html) 0.12+
-
-
-
 ## Building the provider
+
+*Requirements*: [Terraform](https://www.terraform.io/downloads.html) 0.12+
 
 
 ```sh
@@ -33,23 +33,23 @@ See [terraform.io/docs/configuration/providers.html#third-party-plugins](https:/
 
 ## Documentation
 
-See [docs/index.md](./docs/index.md) for provider setup.
+See [registry.terraform.io/providers/mborho/ipfs/latest/docs](https://registry.terraform.io/providers/mborho/ipfs/latest/docs) for documentation and provider setup.
 
 ### Resources:
 
-* [ipfs_add](./docs/resources/add.md)
-* [ipfs_dir](./docs/resources/dir.md)
-* [ipfs_file](./docs/resources/file.md)
-* [ipfs_key](./docs/resources/key.md)
-* [ipfs_pin](./docs/resources/pin.md)
-* [ipfs_remote_pin](./docs/resources/remote-pin.md)
-* [ipfs_swarm_connect](./docs/resources/swarm-connect.md)
-* [ipfs_publish](./docs/resources/publish.md)
+* [ipfs_add](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/add.md)
+* [ipfs_dir](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/dir.md)
+* [ipfs_file](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/file.md)
+* [ipfs_key](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/key.md)
+* [ipfs_pin](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/pin.md)
+* [ipfs_remote_pin](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/remote-pin.md)
+* [ipfs_swarm_connect](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/swarm-connect.md)
+* [ipfs_publish](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/resources/publish.md)
 
 ### Guides
 
-* [Add DNS entry at Cloudflare](./docs/guides/dns.md)
-* [Publish an object as IPNS name.](./docs/guides/publish.md)
+* [Add DNS entry at Cloudflare](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/guides/dns.md)
+* [Publish an object as IPNS name.](https://registry.terraform.io/providers/mborho/ipfs/latest/docs/guides/publish.md)
 
 ## License
 
