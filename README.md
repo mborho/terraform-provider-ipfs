@@ -30,7 +30,6 @@ If **terraform init** can't find the provider, copy the installed binary for you
 
 See [terraform.io/docs/configuration/providers.html#third-party-plugins](https://www.terraform.io/docs/configuration/providers.html#third-party-plugins) for more infos.
 
-
 ## Documentation
 
 See [registry.terraform.io/providers/mborho/ipfs/latest/docs](https://registry.terraform.io/providers/mborho/ipfs/latest/docs) for documentation and provider setup.
@@ -54,5 +53,3 @@ See [registry.terraform.io/providers/mborho/ipfs/latest/docs](https://registry.t
 ## License
 
 [Mozilla Public License 2.0](./LICENSE)
-
-
