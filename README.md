@@ -3,6 +3,8 @@ terraform-provider-ipfs
 
 ![release](https://github.com/mborho/terraform-provider-ipfs/workflows/release/badge.svg)
 
+Released on [registry.terraform.io/providers/mborho/ipfs](https://registry.terraform.io/providers/mborho/ipfs/latest). 
+
 This provider supports Terraform 0.13.x and later. *(0.12.x if building manually*. 
 
 It expects a running IPFS node on the local machine.
