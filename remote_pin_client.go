@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	//"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -50,9 +49,9 @@ func buildPinServiceConfigs(configs []interface{}) map[string]*PinService {
 	}
 
 	services := make(map[string]*PinService)
-	log.Println("[INFO] Load remote service remote clients.")
 	for _, config := range configs {
 		c := config.(map[string]interface{})
+		log.Printf("[INFO] Load remote service remote client %s.", c["name"])
 		service := &PinService{
 			name:          c["name"].(string),
 			endpoint:      c["endpoint"].(string),

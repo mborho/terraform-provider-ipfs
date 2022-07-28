@@ -18,7 +18,6 @@ func Provider() *schema.Provider {
 			"remote_pin_service": {
 				Type:     schema.TypeList,
 				Optional: true,
-				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
